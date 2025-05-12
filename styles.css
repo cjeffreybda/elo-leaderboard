@@ -1,106 +1,185 @@
-:root {
-  --color-background: rgb(184, 185, 240);
-  --color-board-section: rgb(142, 143, 204);
-  --color-board-container: rgb(36, 37, 94);
-  --color-first: rgb(228, 153, 41);
-  --color-second: rgb(32, 138, 209);
-  --color-third: rgb(117, 61, 28);
+@media (prefers-color-scheme: light) {
+  :root {
+    --text: rgb(14, 24, 32);
+    --background: rgb(241, 245, 249);
+    --secondary: #dee2e8;
+    --accent: rgb(255, 173, 173);
+    --mech: #214575;
+    --live: rgb(255, 0, 0);
+    --first: rgb(247, 183, 65);
+    --second: rgb(57, 173, 240);
+    --third: rgb(153, 94, 27);
+  }
 }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: rgb(223, 233, 241);
+    --background: rgb(6, 10, 14);
+    --secondary: #171b21;
+    --accent: rgb(122, 6, 6);
+    --mech: rgb(115, 174, 252);
+    --live: rgb(200, 0, 0);
+    --first: rgb(247, 183, 65);
+    --second: rgb(57, 173, 240);
+    --third: rgb(153, 94, 27);
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 body {
-  background-color: var(--color-background);
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  background-color: var(--background);
   margin: 0px;
 }
 
-p {
-  margin: 0px;
+h1, h2, h3, h4, h5 {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
 }
+
+html {
+  font-size: 100%;
+  color: var(--text);
+}
+
+h1 {font-size: 3.366rem;}
+
+h2 {font-size: 2.525rem;}
+
+h3 {font-size: 1.894rem;}
+
+h4 {font-size: 1.421rem;}
+
+h5 {font-size: 1.066rem;}
+
+small {font-size: 0.600rem;}
 
 .title {
-  font-family: sans-serif;
-  font-size: 40pt;
   text-align: center;
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  text-align: center;
+  margin: 0px 0px 50px 0px;
+}
+
+.mech {
+  color: var(--mech);
+}
+
+.live {
+  background-color: var(--live);
+  padding: 7px 10px;
+  margin-right: 5px;
+  border-radius: 20px;
+  color: white;
+  box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.5);
 }
 
 .section {
-  font-family: sans-serif;
   font-size: xx-large;
   text-align: center;
 }
 
-.button {
-
+.button-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  column-gap: 20px;
+  width: max(min(90%, 500px), 33%);
+  margin: auto;
 }
 
-.text-box {
-  border-radius: 5px;
+.button {
+  font-family: "Inter", sans-serif;
+  font-size: 100%;
+  background-color: var(--secondary);
+  border-style: none;
+  border-radius: 10px;
+  padding: 15px 0px;
+  color: var(--text);
+  transition: background-color 0.1s;
+}
+
+.button:hover {
+  background-color: var(--accent);
+  cursor: pointer;
+}
+
+.button.selected {
+  background-color: var(--accent);
+}
+
+.search-box {
+  border-radius: 10px;
   border-style: none;
   padding: 7px;
-  width: 50%;
+  width: max(min(60%, 333px), 22.2%);
   /* box-shadow: 3px 3px rgba(71, 71, 71, 0.685); */
   margin: 20px auto;
   text-align: center;
   display: block;
-}
-
-.board-section {
-  background-color: var(--color-board-section);
-  padding: 50px;
-  margin: 0px;
+  background-color: var(--secondary);
 }
 
 .board-container {
-  background-color: var(--color-board-container);
-  border-radius: 20px;
-  padding: 0.1px 10px;
   margin: auto;
   width: max(min(90%, 500px), 33%);
   display: block;
   align-content: center;
 }
 
-.leaderboard {
-  
-}
-
 .player-card {
-  background-color: rgb(255, 255, 255);
+  background-color: var(--secondary);
   border-radius: 15px;
-  margin: 10px 0px;
-  padding: 10px 15px;
+  margin: 0px 0px 10px 0px;
+  padding: 15px 15px;
   display: flex;
   align-items: center;
 }
 
+.player-info {
+  margin: 0px;
+}
+
+.podium-card {
+
+}
+
 .player-ranking {
   flex: 1;
-  font-family: sans-serif;
-  text-align: left;
-  font-weight: bold;
-  font-size:x-large;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.421rem;
 }
 
 .first {
-  color: var(--color-first)
+  font-size: 3.366rem;
+  color: var(--first);
+  text-shadow: 0px 0px 25px var(--first);
 }
 
 .second {
-  color: var(--color-second)
+  font-size: 2.525rem;
+  color: var(--second);
+  text-shadow: 0px 0px 25px var(--second);
 }
 
 .third {
-  color: var(--color-third)
+  font-size: 1.894rem;
+  color: var(--third);
+  text-shadow: 0px 0px 25px var(--third);
 }
 
 .player-name {
-  font-family: sans-serif;
-  flex: 1;
+  flex: 4;
   text-align: center;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .player-rating {
-  font-family: sans-serif;
   flex: 1;
-  text-align: right;
+  text-align: center;
 }

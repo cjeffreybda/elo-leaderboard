@@ -5,27 +5,21 @@
   <link rel="stylesheet" href="styles.css?version=1" />
 </head>
 <body>
-  <h1 class="title">Club MECH Leaderboards</h1>
+  <h1 class="title">Club <span class="mech">MECH</span></h1>
+  <h2 class="subtitle"><span class="live">LIVE</span> Leaderboard</h2>
 
-  <input type="button" value="Refresh rankings" id="refresh-scores">
+  <div class="button-container">
+    <input class="button selected" type="button" value="Foosball" id="foos-button">
+    <input class="button" type="button" value="Pong" id="pong-button">
+    <input class="button" type="button" value="Mario Kart" id="kart-button">
+  </div>
 
-  <h2 class="section">Foosball</h2>
+  <input class="search-box" type="text" placeholder="Search by name or student number" id="search">
 
-  <div class="board-section">
-    <div class="board-container">
-      <input class="text-box" type="text" placeholder="Search leaderboard">
-      <div class="leaderboard" id="foos-board"></div>
-    </div>
-  </div>  
-
-  <h2 class="section">Pong</h2>
-
-  
-  <div class="board-section">
-    <div class="board-container">
-      <input class="text-box" type="text" placeholder="Search leaderboard">
-      <div class="leaderboard" id="pong-board"></div>
-    </div>
+  <div class="board-container">
+    <div class="leaderboard" id="foos-board"></div>
+    <div class="leaderboard" id="pong-board" style="display: none;"></div>
+    <div class="leaderboard" id="kart-board" style="display: none;"></div>
   </div>
 
   <script type="module" src="app.js"></script>

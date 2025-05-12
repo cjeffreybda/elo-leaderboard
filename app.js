@@ -16,14 +16,11 @@ let playerNames = new Map();
 
 async function init() {
   await fetch(url1).then(res => res.text()).then(rep => {
-    // console.log(rep.substring(47).slice(0,-2));
     gameData = JSON.parse(rep.substring(47).slice(0,-2)).table.rows;
-    console.log(gameData);
   });
 
   await fetch(url2).then(res => res.text()).then(rep => {
     playerNameData = JSON.parse(rep.substring(47).slice(0,-2)).table.rows;
-    console.log(playerNameData);
   });
 
   for (let i = 0; i < playerNameData.length; i ++) {
@@ -35,7 +32,6 @@ async function init() {
   calculateRatings();
 }
 window.addEventListener("load", await init);
-document.getElementById("refresh-scores").addEventListener("click", init);
 
 function getPlayerRating(game, id) {
   if (game == "Foosball") {
@@ -131,55 +127,75 @@ function refreshLeaderboard() {
   let rankedFoosMap = new Map(Array.from(playerFoosRatings).sort((b, a) => a[1] - b[1]));
   let rankedPongMap = new Map(Array.from(playerPongRatings).sort((b, a) => a[1] - b[1]));
 
-  // console.log(rankedFoosMap);
-
-  let htmlFoos = "";
-  let htmlPong = "";
-
-  let rank = 1;
-  rankedFoosMap.forEach((value, key) => {
-    htmlFoos += "<div class=player-card><p class='player-ranking";
-    
-    switch (rank) {
-      case 1:
-        htmlFoos += ' first';
-        break;
-      case 2:
-        htmlFoos += ' second';
-        break;
-      case 3:
-        htmlFoos += ' third';
-        break;
-      default:
-        break;
-    }
-    
-    htmlFoos += "'>" + rank + "</p><p class=player-name>" + playerNames.get(key) + "</p><p class=player-rating>" + Math.round(value) + "</p></div>";
-    rank ++;
-  });
-
-  rank = 1;
-  rankedPongMap.forEach((value, key) => {
-    htmlPong += "<div class=player-card><p class='player-ranking";
-    
-    switch (rank) {
-      case 1:
-        htmlPong += ' first';
-        break;
-      case 2:
-        htmlPong += ' second';
-        break;
-      case 3:
-        htmlPong += ' third';
-        break;
-      default:
-        break;
-    }
-    
-    htmlPong += "'>" + rank + "</p><p class=player-name>" + playerNames.get(key) + "</p><p class=player-rating>" + Math.round(value) + "</p></div>";
-    rank ++;
-  });
-
-  document.getElementById("foos-board").innerHTML = htmlFoos;
-  document.getElementById("pong-board").innerHTML = htmlPong;
+  document.getElementById("foos-board").innerHTML = makeBoardHTML(Array.from(rankedFoosMap.values()), Array.from(rankedFoosMap.keys()));
+  document.getElementById("pong-board").innerHTML = makeBoardHTML(Array.from(rankedPongMap.values()), Array.from(rankedPongMap.keys()));
+  // document.getElementById("kart-board").innerHTML = makeBoardHTML(Array.from(rankedKartMap.values()), Array.from(rankedKartMap.keys()));
 }
+
+function makeBoardHTML(values, keys) {
+  let html = "";
+
+  for (let i = 0; i < keys.length; i ++) {
+    html += "<div class='player-card' id='player-" + keys[i] + "'><div class='player-ranking";
+    
+    switch (i) {
+      case 0:
+        html += ' first';
+        break;
+      case 1:
+        html += ' second';
+        break;
+      case 2:
+        html += ' third';
+        break;
+      default:
+        break;
+    }
+    
+    html += "'>" + (i + 1) + "</div><div class=player-name>" + playerNames.get(keys[i]) + "</div><div class=player-rating>" + Math.round(values[i]) + "</div></div>";
+  }
+
+  return html;
+}
+
+function changeBoard(id) {
+  document.querySelectorAll(".leaderboard").forEach(el => {
+    el.style.display = "none";
+  });
+  document.querySelectorAll(".button").forEach(el => {
+    el.setAttribute("class", "button");
+  });
+  switch(id) {
+    case "Foosball":
+      document.getElementById("foos-board").style.display = "";
+      document.getElementById("foos-button").setAttribute("class", "button selected");
+      break;
+    case "Pong":
+      document.getElementById("pong-board").style.display = "";
+      document.getElementById("pong-button").setAttribute("class", "button selected");
+      break;
+    case "Mario Kart":
+      document.getElementById("kart-board").style.display = "";
+      document.getElementById("kart-button").setAttribute("class", "button selected");
+      break;
+  }
+}
+document.querySelectorAll(".button").forEach(el => {
+  el.addEventListener("click", event => {changeBoard(el.value);});
+});
+
+function filterSearch() {
+  let input = document.getElementById("search").value.toUpperCase();
+  let cards = document.getElementsByClassName("player-card");
+  for (let i = 0; i < cards.length; i ++) {
+    let id = cards[i].getAttribute("id").substring(7);
+    let name = cards[i].getElementsByClassName("player-name")[0].innerHTML;
+    if (name.toUpperCase().indexOf(input) > -1 || id.indexOf(input) > -1) {
+      cards[i].style.display = "";
+    }
+    else {
+      cards[i].style.display = "none";
+    }
+  }
+}
+document.getElementById("search").addEventListener("keyup", filterSearch);
