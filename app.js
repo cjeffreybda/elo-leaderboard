@@ -136,12 +136,48 @@ function refreshLeaderboard() {
   let htmlFoos = "";
   let htmlPong = "";
 
+  let rank = 1;
   rankedFoosMap.forEach((value, key) => {
-    htmlFoos += "<p><b>" + playerNames.get(key) + "</b></p><p>" + Math.round(value) + "</p>";
+    htmlFoos += "<div class=player-card><p class='player-ranking";
+    
+    switch (rank) {
+      case 1:
+        htmlFoos += ' first';
+        break;
+      case 2:
+        htmlFoos += ' second';
+        break;
+      case 3:
+        htmlFoos += ' third';
+        break;
+      default:
+        break;
+    }
+    
+    htmlFoos += "'>" + rank + "</p><p class=player-name>" + playerNames.get(key) + "</p><p class=player-rating>" + Math.round(value) + "</p></div>";
+    rank ++;
   });
 
+  rank = 1;
   rankedPongMap.forEach((value, key) => {
-    htmlPong += "<p><b>" + playerNames.get(key) + "</b></p><p>" + Math.round(value) + "</p>";
+    htmlPong += "<div class=player-card><p class='player-ranking";
+    
+    switch (rank) {
+      case 1:
+        htmlPong += ' first';
+        break;
+      case 2:
+        htmlPong += ' second';
+        break;
+      case 3:
+        htmlPong += ' third';
+        break;
+      default:
+        break;
+    }
+    
+    htmlPong += "'>" + rank + "</p><p class=player-name>" + playerNames.get(key) + "</p><p class=player-rating>" + Math.round(value) + "</p></div>";
+    rank ++;
   });
 
   document.getElementById("foos-board").innerHTML = htmlFoos;

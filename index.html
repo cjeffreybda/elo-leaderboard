@@ -5,19 +5,28 @@
   <link rel="stylesheet" href="styles.css?version=1" />
 </head>
 <body>
-  <h1>Club MECH Leaderboards</h1>
+  <h1 class="title">Club MECH Leaderboards</h1>
 
   <input type="button" value="Refresh rankings" id="refresh-scores">
 
-  <h2>Foosball</h2>
+  <h2 class="section">Foosball</h2>
 
-  <input class="text-box" type="text" placeholder="Search leaderboard">
-  <div class="leaderboard" id="foos-board"></div>
+  <div class="board-section">
+    <div class="board-container">
+      <input class="text-box" type="text" placeholder="Search leaderboard">
+      <div class="leaderboard" id="foos-board"></div>
+    </div>
+  </div>  
 
-  <h2>Pong</h2>
+  <h2 class="section">Pong</h2>
 
-  <input class="text-box" type="text" placeholder="Search leaderboard">
-  <div class="leaderboard" id="pong-board"></div>
+  
+  <div class="board-section">
+    <div class="board-container">
+      <input class="text-box" type="text" placeholder="Search leaderboard">
+      <div class="leaderboard" id="pong-board"></div>
+    </div>
+  </div>
 
   <script type="module" src="app.js"></script>
 </body>
