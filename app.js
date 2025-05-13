@@ -31,7 +31,7 @@ async function init() {
 
   calculateRatings();
 }
-window.addEventListener("load", await init);
+window.addEventListener("DOMContentLoaded", init);
 
 function getPlayerRating(game, id) {
   if (game == "Foosball") {
@@ -136,6 +136,8 @@ function makeBoardHTML(values, keys) {
   let html = "";
 
   for (let i = 0; i < keys.length; i ++) {
+    let playerName = playerNames.get(keys[i]) ? playerNames.get(keys[i]) : "Anonymous";
+
     html += "<div class='player-card' id='player-" + keys[i] + "'><div class='player-ranking";
     
     switch (i) {
@@ -152,7 +154,7 @@ function makeBoardHTML(values, keys) {
         break;
     }
     
-    html += "'>" + (i + 1) + "</div><div class=player-name>" + playerNames.get(keys[i]) + "</div><div class=player-rating>" + Math.round(values[i]) + "</div></div>";
+    html += "'>" + (i + 1) + "</div><div class=player-name>" + playerName + "</div><div class=player-rating>" + Math.round(values[i]) + "</div></div>";
   }
 
   return html;
