@@ -1,11 +1,12 @@
 @media (prefers-color-scheme: light) {
   :root {
-    --text: rgb(14, 24, 32);
-    --background: rgb(241, 245, 249);
-    --secondary: #dee2e8;
+    --text: rgb(25, 25, 30);
+    --background: rgb(250, 250, 255);
+    --secondary: rgb(230, 230, 240);
     --accent: rgb(255, 173, 173);
-    --mech: #214575;
+    --mech: rgb(33, 69, 117);
     --live: rgb(255, 0, 0);
+    --live-glow: rgba(255, 0, 0, 0.7);
     --first: rgb(247, 183, 65);
     --second: rgb(57, 173, 240);
     --third: rgb(153, 94, 27);
@@ -13,12 +14,13 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: rgb(223, 233, 241);
-    --background: rgb(6, 10, 14);
-    --secondary: #171b21;
-    --accent: rgb(122, 6, 6);
-    --mech: rgb(115, 174, 252);
+    --text: rgb(224, 224, 229);
+    --background: rgb(10, 10, 15);
+    --secondary: rgb(27, 27, 35);
+    --accent: rgb(130, 0, 0);
+    --mech: rgb(136, 157, 205);
     --live: rgb(200, 0, 0);
+    --live-glow: rgba(200, 0, 0, 1);
     --first: rgb(247, 183, 65);
     --second: rgb(57, 173, 240);
     --third: rgb(153, 94, 27);
@@ -32,20 +34,20 @@
   zoom: 1.0;
 }
 
+body {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  background-color: var(--background);
+}
+
 @media (max-width: 600px) {
   body {
-    font-family: "Inter", sans-serif;
-    font-weight: 400;
-    background-color: var(--background);
     margin: 50px 5%;
   }
 }
 
 @media (min-width: 601px) {
   body {
-    font-family: "Inter", sans-serif;
-    font-weight: 400;
-    background-color: var(--background);
     margin: 0px;
   }
 }
@@ -53,6 +55,7 @@
 html {
   font-size: 100%;
   color: var(--text);
+  overflow-y: scroll;
 }
 
 h1, h2, h3, h4, h5 {
@@ -104,11 +107,11 @@ h1, h2, h3, h4, h5 {
 
 .live {
   background-color: var(--live);
-  padding: 7px 10px;
+  padding: 7px 12px;
   margin-right: 5px;
   border-radius: 20px;
   color: white;
-  box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.5);
+  box-shadow: 0px 0px 10px var(--live-glow);
 }
 
 .section {
@@ -120,7 +123,7 @@ h1, h2, h3, h4, h5 {
   display: grid;
   grid-template-columns: auto auto auto;
   column-gap: 20px;
-  width: max(min(90%, 500px), 33%);
+  width: max(min(95%, 500px), 33%);
   margin: auto;
 }
 
@@ -144,23 +147,25 @@ h1, h2, h3, h4, h5 {
   background-color: var(--accent);
 }
 
+.search-container {
+  margin: 20px auto;
+  width: min(95%, 500px);
+}
+
 .search-box {
   font-family: "Inter", sans-serif;
+  width: 100%;
   font-size: 100%;
   border-radius: 10px;
   border-style: none;
-  padding: 10px;
-  width: max(min(60%, 333px), 22.2%);
-  /* box-shadow: 3px 3px rgba(71, 71, 71, 0.685); */
-  margin: 20px auto;
+  padding: 10px 0px;
   text-align: center;
-  display: block;
   background-color: var(--secondary);
 }
 
 .board-container {
   margin: auto;
-  width: max(min(90%, 500px), 33%);
+  width: min(95%, 500px);
   display: block;
   align-content: center;
 }
@@ -176,10 +181,6 @@ h1, h2, h3, h4, h5 {
 
 .player-info {
   margin: 0px;
-}
-
-.podium-card {
-
 }
 
 .player-ranking {
@@ -208,9 +209,10 @@ h1, h2, h3, h4, h5 {
 }
 
 .player-name {
-  flex: 4;
+  flex: 3;
   text-align: center;
   font-weight: 600;
+  padding: 0px 15px;
 }
 
 .player-rating {

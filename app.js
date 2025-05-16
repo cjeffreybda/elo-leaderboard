@@ -6,13 +6,32 @@ const query = encodeURIComponent("Select *");
 const url1 = `${base}&sheet=${sheetName1}&tq=${query}`;
 const url2 = `${base}&sheet=${sheetName2}&tq=${query}`;
 
+const PARAMS = {
+  "Foosball": {
+    "INIT_RATING": 1000.0,
+    "BASE": 10.0,
+    "DIVISOR": 400.0,
+    "K": 100.0
+  },
+  "Pong": {
+    "INIT_RATING": 1000.0,
+    "BASE": 10.0,
+    "DIVISOR": 400.0,
+    "K": 100.0
+  },
+  "Mario Kart": {
+    "INIT_RATING": 1000.0,
+    "BASE": 10.0,
+    "DIVISOR": 400.0,
+    "K": 100.0
+  }
+}
+
 let gameData;
 let playerNameData;
 
-let playerFoosRatings;
-let playerPongRatings;
-
-let playerNames = new Map();
+let playerRatings;
+let playerNames;
 
 async function init() {
   await fetch(url1).then(res => res.text()).then(rep => {
@@ -23,6 +42,7 @@ async function init() {
     playerNameData = JSON.parse(rep.substring(47).slice(0,-2)).table.rows;
   });
 
+  playerNames = new Map();
   for (let i = 0; i < playerNameData.length; i ++) {
     let id = Number(playerNameData[i].c[0].v);
     let name = playerNameData[i].c[1].v;
@@ -34,102 +54,97 @@ async function init() {
 window.addEventListener("DOMContentLoaded", init);
 
 function getPlayerRating(game, id) {
-  if (game == "Foosball") {
-    if (playerFoosRatings.has(id)) {
-      return playerFoosRatings.get(id);
-    }
-    else
-    {
-      playerFoosRatings.set(id, 1000);
-      return 1000;
-    }
+  if (playerRatings[game].has(id)) {
+    return playerRatings[game].get(id);
   }
-  else if (game == "Pong") {
-    if (playerPongRatings.has(id)) {
-      return playerPongRatings.get(id);
-    }
-    else
-    {
-      playerPongRatings.set(id, 1000);
-      return 1000;
-    }
-  }
+  playerRatings[game].set(id, PARAMS[game].INIT_RATING);
+  return PARAMS[game].INIT_RATING;
 }
 
 function setPlayerRating(game, id, rating) {
-  if (game == "Foosball") {
-    playerFoosRatings.set(id, rating);
-  }
-  else if (game == "Pong") {
-    playerPongRatings.set(id, rating);
-  }
+  playerRatings[game].set(id, rating);
 }
 
 function calculateRatings() {
-  playerFoosRatings = new Map();
-  playerPongRatings = new Map();
+  playerRatings = {
+    "Foosball": new Map(),
+    "Pong": new Map(),
+    "Mario Kart": new Map()
+  };
 
-  for (let i = 0; i < gameData.length; i ++) {
+  for (let r = 0; r < gameData.length; r ++) {
     // get game
-    let game = gameData[i].c[1].v;
+    let game = gameData[r].c[1].v;
 
     // get player ids
-    let w1id = Number(gameData[i].c[3].v);
-    let w2id = gameData[i].c[4] != null ? Number(gameData[i].c[4].v) : 0;
-    let l1id = Number(gameData[i].c[5].v);
-    let l2id = gameData[i].c[6] != null ? Number(gameData[i].c[6].v) : 0;
+    let ids = [];
+    ids[0] = Number(gameData[r].c[2].v);
+    ids[1] = gameData[r].c[3] != null ? Number(gameData[r].c[3].v) : 0;
+    ids[2] = Number(gameData[r].c[4].v);
+    ids[3] = gameData[r].c[5] != null ? Number(gameData[r].c[5].v) : 0;
 
     // get player ratings (or set to 1000 if new)
-    let w1r = getPlayerRating(game, w1id);
-    let w2r = w1r;
-    if (w2id != 0) {
-      w2r = getPlayerRating(game, w2id);
+    let Rs = []; // prior ratings
+    let playerCount = 0;
+    for (let i = 0; i < 4; i ++) {
+      if (ids[i] != 0) {
+        Rs[i] = getPlayerRating(game, ids[i]);
+        playerCount ++;
+      }
+      else {
+        Rs[i] = Rs[i-2];
+      }
     }
 
-    let rw = Math.max(w1r, w2r);
+    if (game == "Mario Kart") {
+      let Qs = []; // q values
+      for (let i = 0; i < playerCount; i ++) {
+        Qs[i] = Math.pow(PARAMS[game].BASE, Rs[i] / PARAMS[game].DIVISOR);
+      }
 
-    let l1r = getPlayerRating(game, l1id);
-    let l2r = l1r;
-    if (l2id != 0) {
-      l2r = getPlayerRating(game, l2id);
+      let Es = [new Array(playerCount), new Array(playerCount), new Array(playerCount), new Array(playerCount)]; // estimated scores
+      for (let i = 0; i < playerCount; i ++) {
+        for (let j = 0; j < playerCount; j ++) {
+          Es[i][j] = Qs[i] / (Qs[i] + Qs[j]); // player i playing against player j
+        }
+      }
+
+      let Ss = [Number(gameData[r].c[7].v), Number(gameData[r].c[8].v), Number(gameData[r].c[9].v), Number(gameData[r].c[10].v)]; // actual scores
+
+      for (let i = 0; i < playerCount; i ++) {
+        let mult = 0;
+        for (let j = 0; j < playerCount; j ++) {
+          if (i == j) { continue; }
+          let wld = Ss[i] > Ss[j] ? 1 : Ss[i] < Ss[j] ? 0 : 0.5; // win-lose-draw
+          mult += wld - Es[i][j];
+        }
+        setPlayerRating(game, ids[i], Rs[i] + PARAMS[game].K / (playerCount - 1) * mult);
+      }
     }
+    else { // foos & pong
+      let Rt = [Math.max(Rs[0], Rs[2]), Math.max(Rs[1], Rs[3])]; // ratings for team 1 and 2
+      let Qs = [Math.pow(PARAMS[game].BASE, Rt[0] / PARAMS[game].DIVISOR), Math.pow(PARAMS[game].BASE, Rt[1] / PARAMS[game].DIVISOR)];
+      let Es = [Qs[0] / (Qs[0] + Qs[1]), Qs[1] / (Qs[0] + Qs[1])]; // estimated scores for team 1 and 2
+      let Ss = [gameData[r].c[6].v == "P1 and P3" ? 1 : 0, gameData[r].c[6].v == "P2 and P4" ? 1 : 0]; // actual scores for team 1 and 2
 
-    let rl = Math.max(l1r, l2r);
-
-    // calc estimated scores and deltas
-    let qw = Math.pow(10, rw / 400.0);
-    let ql = Math.pow(10, rl / 400.0);
-
-    let ew = qw / (qw + ql);
-    let el = ql / (qw + ql);
-
-    let dw = 100 * (1 - ew);
-    let dl = 100 * -el;
-
-    // update ratings
-    setPlayerRating(game, w1id, w1r + dw);
-    if (w2id != 0) {
-      setPlayerRating(game, w2id, w2r + dw)
-    }
-
-    setPlayerRating(game, l1id, l1r + dl);
-    if (l2id != 0) {
-      setPlayerRating(game, l2id, l2r + dl);
+      for (let i = 0; i < 4; i ++) {
+        if (ids[i] == 0) { continue; }
+        setPlayerRating(game, ids[i], Rs[i] + PARAMS[game].K * (Ss[i % 2] - Es[i % 2]));
+      }
     }
   }
-    
-  // console.log(playerRatings);
 
   refreshLeaderboard();
 }
 
 function refreshLeaderboard() {
-  let rankedFoosMap = new Map(Array.from(playerFoosRatings).sort((b, a) => a[1] - b[1]));
-  let rankedPongMap = new Map(Array.from(playerPongRatings).sort((b, a) => a[1] - b[1]));
+  let rankedFoosMap = new Map(Array.from(playerRatings["Foosball"]).sort((b, a) => a[1] - b[1]));
+  let rankedPongMap = new Map(Array.from(playerRatings["Pong"]).sort((b, a) => a[1] - b[1]));
+  let rankedKartMap = new Map(Array.from(playerRatings["Mario Kart"]).sort((b, a) => a[1] - b[1]));
 
   document.getElementById("foos-board").innerHTML = makeBoardHTML(Array.from(rankedFoosMap.values()), Array.from(rankedFoosMap.keys()));
   document.getElementById("pong-board").innerHTML = makeBoardHTML(Array.from(rankedPongMap.values()), Array.from(rankedPongMap.keys()));
-  // document.getElementById("kart-board").innerHTML = makeBoardHTML(Array.from(rankedKartMap.values()), Array.from(rankedKartMap.keys()));
+  document.getElementById("kart-board").innerHTML = makeBoardHTML(Array.from(rankedKartMap.values()), Array.from(rankedKartMap.keys()));
 }
 
 function makeBoardHTML(values, keys) {
@@ -138,30 +153,26 @@ function makeBoardHTML(values, keys) {
   for (let i = 0; i < keys.length; i ++) {
     let playerName = playerNames.get(keys[i]) ? playerNames.get(keys[i]) : "Anonymous";
 
-    html += "<div class='player-card' id='player-" + keys[i] + "'><div class='player-ranking";
-    
-    switch (i) {
-      case 0:
-        html += ' first';
-        break;
-      case 1:
-        html += ' second';
-        break;
-      case 2:
-        html += ' third';
-        break;
-      default:
-        break;
+    let tieCount = 0;
+    while (i > 0 && Math.round(values[i]) == Math.round(values[i - 1])) {
+      i --;
+      tieCount ++;
     }
+
+    html += "<div class='player-card'><div class='player-ranking";
+
+    html += i == 0 ? " first" : i == 1 ? " second" : i == 2 ? " third" : "";
     
     html += "'>" + (i + 1) + "</div><div class=player-name>" + playerName + "</div><div class=player-rating>" + Math.round(values[i]) + "</div></div>";
+
+    i += tieCount;
   }
 
   return html;
 }
 
 function changeBoard(id) {
-  document.querySelectorAll(".leaderboard").forEach(el => {
+  document.querySelectorAll(".board-container").forEach(el => {
     el.style.display = "none";
   });
   document.querySelectorAll(".button").forEach(el => {
@@ -190,9 +201,8 @@ function filterSearch() {
   let input = document.getElementById("search").value.toUpperCase();
   let cards = document.getElementsByClassName("player-card");
   for (let i = 0; i < cards.length; i ++) {
-    let id = cards[i].getAttribute("id").substring(7);
     let name = cards[i].getElementsByClassName("player-name")[0].innerHTML;
-    if (name.toUpperCase().indexOf(input) > -1 || id.indexOf(input) > -1) {
+    if (name.toUpperCase().indexOf(input) > -1) {
       cards[i].style.display = "";
     }
     else {
