@@ -27,6 +27,8 @@ const PARAMS = {
   }
 }
 
+const SHORTS = new Map([["Foosball", "foos"], ["Pong", "pong"], ["Mario Kart", "kart"]]);
+
 let gameData;
 let playerNameData;
 
@@ -79,8 +81,8 @@ function calculateRatings() {
     // get player ids
     let ids = [];
     ids[0] = Number(gameData[r].c[2].v);
-    ids[1] = gameData[r].c[3] != null ? Number(gameData[r].c[3].v) : 0;
-    ids[2] = Number(gameData[r].c[4].v);
+    ids[1] = Number(gameData[r].c[3].v);
+    ids[2] = gameData[r].c[4] != null ? Number(gameData[r].c[4].v) : 0;
     ids[3] = gameData[r].c[5] != null ? Number(gameData[r].c[5].v) : 0;
 
     // get player ratings (or set to 1000 if new)
@@ -138,13 +140,13 @@ function calculateRatings() {
 }
 
 function refreshLeaderboard() {
-  let rankedFoosMap = new Map(Array.from(playerRatings["Foosball"]).sort((b, a) => a[1] - b[1]));
-  let rankedPongMap = new Map(Array.from(playerRatings["Pong"]).sort((b, a) => a[1] - b[1]));
-  let rankedKartMap = new Map(Array.from(playerRatings["Mario Kart"]).sort((b, a) => a[1] - b[1]));
+  for (let i = 0; i < Array.from(SHORTS.keys()).length; i ++) {
+    let rankedMap = new Map(Array.from(playerRatings[Array.from(SHORTS.keys())[i]]).sort((b, a) => a[1] - b[1]));
+    document.getElementById(Array.from(SHORTS.values())[i] + "-board").innerHTML = makeBoardHTML(Array.from(rankedMap.values()), Array.from(rankedMap.keys()));
+  }
 
-  document.getElementById("foos-board").innerHTML = makeBoardHTML(Array.from(rankedFoosMap.values()), Array.from(rankedFoosMap.keys()));
-  document.getElementById("pong-board").innerHTML = makeBoardHTML(Array.from(rankedPongMap.values()), Array.from(rankedPongMap.keys()));
-  document.getElementById("kart-board").innerHTML = makeBoardHTML(Array.from(rankedKartMap.values()), Array.from(rankedKartMap.keys()));
+  // let cards = document.querySelectorAll(".player-card");
+  // cards.forEach((el) => observer.observe(el));
 }
 
 function makeBoardHTML(values, keys) {
@@ -153,13 +155,15 @@ function makeBoardHTML(values, keys) {
   for (let i = 0; i < keys.length; i ++) {
     let playerName = playerNames.get(keys[i]) ? playerNames.get(keys[i]) : "Anonymous";
 
+    let delay = i * 0; // ms
+
     let tieCount = 0;
     while (i > 0 && Math.round(values[i]) == Math.round(values[i - 1])) {
       i --;
       tieCount ++;
     }
 
-    html += "<div class='player-card'><div class='player-ranking";
+    html += "<div class='player-card' style='transition-delay: " + delay + "ms;'><div class='player-ranking";
 
     html += i == 0 ? " first" : i == 1 ? " second" : i == 2 ? " third" : "";
     
@@ -176,30 +180,18 @@ function changeBoard(id) {
     el.style.display = "none";
   });
   document.querySelectorAll(".button").forEach(el => {
-    el.setAttribute("class", "button");
+    el.classList.remove("selected");
   });
-  switch(id) {
-    case "Foosball":
-      document.getElementById("foos-board").style.display = "";
-      document.getElementById("foos-button").setAttribute("class", "button selected");
-      break;
-    case "Pong":
-      document.getElementById("pong-board").style.display = "";
-      document.getElementById("pong-button").setAttribute("class", "button selected");
-      break;
-    case "Mario Kart":
-      document.getElementById("kart-board").style.display = "";
-      document.getElementById("kart-button").setAttribute("class", "button selected");
-      break;
-  }
+  document.getElementById(SHORTS.get(id) + "-board").style.display = "";
+  document.getElementById(SHORTS.get(id) + "-button").classList.add("selected");
 }
 document.querySelectorAll(".button").forEach(el => {
   el.addEventListener("click", event => {changeBoard(el.value);});
 });
 
 function filterSearch() {
+  let cards = document.querySelectorAll(".player-card");
   let input = document.getElementById("search").value.toUpperCase();
-  let cards = document.getElementsByClassName("player-card");
   for (let i = 0; i < cards.length; i ++) {
     let name = cards[i].getElementsByClassName("player-name")[0].innerHTML;
     if (name.toUpperCase().indexOf(input) > -1) {
@@ -211,3 +203,14 @@ function filterSearch() {
   }
 }
 document.getElementById("search").addEventListener("keyup", filterSearch);
+
+// const observer = new IntersectionObserver((entries) => {
+//   entries.forEach((entry) => {
+//     if (entry.isIntersecting) {
+//       entry.target.classList.add("show");
+//     }
+//     else {
+//       entry.target.classList.remove("show");
+//     }
+//   });
+// });

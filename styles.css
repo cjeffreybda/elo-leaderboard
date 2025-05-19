@@ -114,28 +114,36 @@ h1, h2, h3, h4, h5 {
   box-shadow: 0px 0px 10px var(--live-glow);
 }
 
-.section {
-  font-size: xx-large;
-  text-align: center;
+.content-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
 }
 
 .button-container {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  column-gap: 20px;
-  width: max(min(95%, 500px), 33%);
-  margin: auto;
+  width: min(95%, 500px);
+  display: flex;
+  flex-direction: row;
+  justify-content:space-between;
+  gap: 15px;
+  flex-grow: 1;
+  flex-wrap: wrap;
 }
 
 .button {
+  /* flex: 1; */
   font-family: "Inter", sans-serif;
   font-size: 100%;
   background-color: var(--secondary);
   border-style: none;
   border-radius: 10px;
-  padding: 15px 0px;
+  padding: 15px 10px;
   color: var(--text);
   transition: background-color 0.1s;
+  flex-grow: 1;
 }
 
 .button:hover {
@@ -147,14 +155,9 @@ h1, h2, h3, h4, h5 {
   background-color: var(--accent);
 }
 
-.search-container {
-  margin: 20px auto;
-  width: min(95%, 500px);
-}
-
 .search-box {
+  width: min(95%, 500px);
   font-family: "Inter", sans-serif;
-  width: 100%;
   font-size: 100%;
   border-radius: 10px;
   border-style: none;
@@ -165,27 +168,48 @@ h1, h2, h3, h4, h5 {
 }
 
 .board-container {
-  margin: auto;
-  width: min(95%, 500px);
-  display: block;
-  align-content: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 100px;
 }
 
 .player-card {
+  width: min(95%, 500px);
   background-color: var(--secondary);
   border-radius: 15px;
-  margin: 0px 0px 10px 0px;
-  padding: 15px 15px;
+  padding: 15px 0px;
   display: flex;
+  flex-direction: row;
+  justify-content: center;
   align-items: center;
+  flex-grow: 1;
+  /* opacity: 0;
+  transform: translateY(10px);
+  transition: all 300ms; */
 }
+
+/* @media(prefers-reduced-motion) {
+  .player-card {
+    transition: none;
+  }
+}
+
+.show {
+  opacity: 1;
+  transform: translateY(0px);
+} */
 
 .player-info {
   margin: 0px;
 }
 
 .player-ranking {
-  flex: 1;
+  margin-left: 20px;
+  width: 50px;
   text-align: center;
   font-weight: 700;
   font-size: 1.421rem;
@@ -210,13 +234,15 @@ h1, h2, h3, h4, h5 {
 }
 
 .player-name {
-  flex: 3;
+  flex-grow: 1;
+  flex-shrink: 1;
   text-align: center;
-  font-weight: 600;
+  /* font-weight: 600; */
   padding: 0px 15px;
 }
 
 .player-rating {
-  flex: 1;
+  margin-right: 20px;
+  width: 50px;
   text-align: center;
 }

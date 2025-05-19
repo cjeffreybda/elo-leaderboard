@@ -9,19 +9,19 @@
   <h1 class="title">Club <span class="mech">MECH</span></h1>
   <h2 class="subtitle"><span class="live">LIVE</span> Leaderboard</h2>
 
-  <div class="button-container">
-    <input class="button selected" type="button" value="Foosball" id="foos-button">
-    <input class="button" type="button" value="Pong" id="pong-button">
-    <input class="button" type="button" value="Mario Kart" id="kart-button">
-  </div>
+  <div class="content-container">
+    <div class="button-container">
+      <input class="button selected" type="button" value="Foosball" id="foos-button">
+      <input class="button" type="button" value="Pong" id="pong-button">
+      <input class="button" type="button" value="Mario Kart" id="kart-button">
+    </div>
 
-  <div class="search-container">
     <input class="search-box" type="text" placeholder="Search leaderboard" id="search">
-  </div>
 
-  <div class="board-container" id="foos-board"></div>
-  <div class="board-container" id="pong-board" style="display: none;"></div>
-  <div class="board-container" id="kart-board" style="display: none;"></div>
+    <div class="board-container" id="foos-board"></div>
+    <div class="board-container" id="pong-board" style="display: none;"></div>
+    <div class="board-container" id="kart-board" style="display: none;"></div>
+  </div>
 
   <script type="module" src="app.js"></script>
 </body>
