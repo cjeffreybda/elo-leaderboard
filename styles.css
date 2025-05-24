@@ -27,8 +27,6 @@
   }
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-
 @viewport {
   width: device-width;
   zoom: 1.0;
@@ -59,7 +57,6 @@ html {
 }
 
 h1, h2, h3, h4, h5 {
-  font-family: "Inter", sans-serif;
   font-weight: 700;
 }
 
@@ -112,6 +109,11 @@ h1, h2, h3, h4, h5 {
   border-radius: 20px;
   color: white;
   box-shadow: 0px 0px 10px var(--live-glow);
+  text-decoration: none;
+}
+
+.live:hover {
+  cursor: pointer;
 }
 
 .content-container {

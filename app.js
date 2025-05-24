@@ -24,10 +24,13 @@ const PARAMS = {
     "BASE": 10.0,
     "DIVISOR": 400.0,
     "K": 100.0
+  },
+  "BOAT Race": {
+    "INIT_RATING": Number.POSITIVE_INFINITY
   }
 }
 
-const SHORTS = new Map([["Foosball", "foos"], ["Pong", "pong"], ["Mario Kart", "kart"]]);
+const SHORTS = new Map([["Foosball", "foos"], ["Pong", "pong"], ["Mario Kart", "kart"], ["BOAT Race", "boat"]]);
 
 let gameData;
 let playerNameData;
@@ -52,6 +55,9 @@ async function init() {
   }
 
   calculateRatings();
+
+  let currentBoard = localStorage.currentBoard != null ? localStorage.currentBoard : "Foosball";
+  changeBoard(currentBoard);
 }
 window.addEventListener("DOMContentLoaded", init);
 
@@ -71,7 +77,8 @@ function calculateRatings() {
   playerRatings = {
     "Foosball": new Map(),
     "Pong": new Map(),
-    "Mario Kart": new Map()
+    "Mario Kart": new Map(),
+    "BOAT Race": new Map()
   };
 
   for (let r = 0; r < gameData.length; r ++) {
@@ -81,7 +88,7 @@ function calculateRatings() {
     // get player ids
     let ids = [];
     ids[0] = Number(gameData[r].c[2].v);
-    ids[1] = Number(gameData[r].c[3].v);
+    ids[1] = gameData[r].c[3] != null ? Number(gameData[r].c[3].v) : 0;
     ids[2] = gameData[r].c[4] != null ? Number(gameData[r].c[4].v) : 0;
     ids[3] = gameData[r].c[5] != null ? Number(gameData[r].c[5].v) : 0;
 
@@ -94,11 +101,17 @@ function calculateRatings() {
         playerCount ++;
       }
       else {
-        Rs[i] = Rs[i-2];
+        Rs[i] = Rs[Math.max(i-2, 0)];
       }
     }
 
-    if (game == "Mario Kart") {
+    if (game == "BOAT Race") {
+      let time = gameData[r].c[11].v;
+      if (time < Rs[0]) {
+        setPlayerRating(game, ids[0], time);
+      }
+    }
+    else if (game == "Mario Kart") {
       let Qs = []; // q values
       for (let i = 0; i < playerCount; i ++) {
         Qs[i] = Math.pow(PARAMS[game].BASE, Rs[i] / PARAMS[game].DIVISOR);
@@ -141,15 +154,24 @@ function calculateRatings() {
 
 function refreshLeaderboard() {
   for (let i = 0; i < Array.from(SHORTS.keys()).length; i ++) {
-    let rankedMap = new Map(Array.from(playerRatings[Array.from(SHORTS.keys())[i]]).sort((b, a) => a[1] - b[1]));
-    document.getElementById(Array.from(SHORTS.values())[i] + "-board").innerHTML = makeBoardHTML(Array.from(rankedMap.values()), Array.from(rankedMap.keys()));
+
+    let game = Array.from(SHORTS.values())[i];
+    let rankedMap;
+
+    if (game == "boat") {
+      rankedMap = new Map(Array.from(playerRatings[Array.from(SHORTS.keys())[i]]).sort((a, b) => a[1] - b[1]));
+    }
+    else {
+      rankedMap = new Map(Array.from(playerRatings[Array.from(SHORTS.keys())[i]]).sort((b, a) => a[1] - b[1]));
+    }
+    document.getElementById(game + "-board").innerHTML = makeBoardHTML(Array.from(rankedMap.values()), Array.from(rankedMap.keys()), game == "boat" ? 3 : 0);
   }
 
   // let cards = document.querySelectorAll(".player-card");
   // cards.forEach((el) => observer.observe(el));
 }
 
-function makeBoardHTML(values, keys) {
+function makeBoardHTML(values, keys, round) {
   let html = "";
 
   for (let i = 0; i < keys.length; i ++) {
@@ -157,8 +179,10 @@ function makeBoardHTML(values, keys) {
 
     let delay = i * 0; // ms
 
+    let rating = Math.round(values[i] * Math.pow(10, round)) / Math.pow(10, round);
+
     let tieCount = 0;
-    while (i > 0 && Math.round(values[i]) == Math.round(values[i - 1])) {
+    while (i > 0 && rating == Math.round(values[i - 1] * Math.pow(10, round)) / Math.pow(10, round)) {
       i --;
       tieCount ++;
     }
@@ -167,7 +191,7 @@ function makeBoardHTML(values, keys) {
 
     html += i == 0 ? " first" : i == 1 ? " second" : i == 2 ? " third" : "";
     
-    html += "'>" + (i + 1) + "</div><div class=player-name>" + playerName + "</div><div class=player-rating>" + Math.round(values[i]) + "</div></div>";
+    html += "'>" + (i + 1) + "</div><div class=player-name>" + playerName + "</div><div class=player-rating>" + rating.toFixed(round) + "</div></div>";
 
     i += tieCount;
   }
@@ -184,6 +208,8 @@ function changeBoard(id) {
   });
   document.getElementById(SHORTS.get(id) + "-board").style.display = "";
   document.getElementById(SHORTS.get(id) + "-button").classList.add("selected");
+
+  localStorage.currentBoard = id;
 }
 document.querySelectorAll(".button").forEach(el => {
   el.addEventListener("click", event => {changeBoard(el.value);});
