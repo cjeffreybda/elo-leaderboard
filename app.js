@@ -87,10 +87,12 @@ function calculateRatings() {
 
     // get player ids
     let ids = [];
-    ids[0] = Number(gameData[r].c[2].v);
-    ids[1] = gameData[r].c[3] != null ? Number(gameData[r].c[3].v) : 0;
-    ids[2] = gameData[r].c[4] != null ? Number(gameData[r].c[4].v) : 0;
-    ids[3] = gameData[r].c[5] != null ? Number(gameData[r].c[5].v) : 0;
+    // team A
+    ids[0] = Number(gameData[r].c[2].v); // P1
+    ids[1] = gameData[r].c[3] != null ? Number(gameData[r].c[3].v) : 0; // P2
+    // team B
+    ids[2] = gameData[r].c[4] != null ? Number(gameData[r].c[4].v) : 0; // P3
+    ids[3] = gameData[r].c[5] != null ? Number(gameData[r].c[5].v) : 0; // P4
 
     // get player ratings (or set to 1000 if new)
     let Rs = []; // prior ratings
@@ -101,7 +103,7 @@ function calculateRatings() {
         playerCount ++;
       }
       else {
-        Rs[i] = Rs[Math.max(i-2, 0)];
+        Rs[i] = Rs[Math.max(i-1, 0)];
       }
     }
 
@@ -137,14 +139,14 @@ function calculateRatings() {
       }
     }
     else { // foos & pong
-      let Rt = [Math.max(Rs[0], Rs[2]), Math.max(Rs[1], Rs[3])]; // ratings for team 1 and 2
+      let Rt = [Math.max(Rs[0], Rs[1]), Math.max(Rs[2], Rs[3])]; // ratings for team A and B
       let Qs = [Math.pow(PARAMS[game].BASE, Rt[0] / PARAMS[game].DIVISOR), Math.pow(PARAMS[game].BASE, Rt[1] / PARAMS[game].DIVISOR)];
-      let Es = [Qs[0] / (Qs[0] + Qs[1]), Qs[1] / (Qs[0] + Qs[1])]; // estimated scores for team 1 and 2
-      let Ss = [gameData[r].c[6].v == "P1 and P3" ? 1 : 0, gameData[r].c[6].v == "P2 and P4" ? 1 : 0]; // actual scores for team 1 and 2
+      let Es = [Qs[0] / (Qs[0] + Qs[1]), Qs[1] / (Qs[0] + Qs[1])]; // estimated scores for team A and B
+      let Ss = [gameData[r].c[6].v == "Team A" ? 1 : 0, gameData[r].c[6].v == "Team B" ? 1 : 0]; // actual scores for team A and B
 
       for (let i = 0; i < 4; i ++) {
         if (ids[i] == 0) { continue; }
-        setPlayerRating(game, ids[i], Rs[i] + PARAMS[game].K * (Ss[i % 2] - Es[i % 2]));
+        setPlayerRating(game, ids[i], Rs[i] + PARAMS[game].K * (Ss[Math.floor(i / 2)] - Es[Math.floor(i / 2)]));
       }
     }
   }
